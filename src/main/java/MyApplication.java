@@ -1,4 +1,5 @@
 
+import Helpers.RestClient;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Environment;
 import RestResource.Resource;
@@ -14,7 +15,8 @@ public class MyApplication extends Application<MyConfiguration> {
     @Override
     public void run(MyConfiguration myConfiguration, Environment environment) throws Exception {
 
-        Resource resource =  new Resource();
+        RestClient restClient = new RestClient("https://api.havenondemand.com/1/");
+        Resource resource =  new Resource(restClient);
         environment.jersey().register(resource);
         environment.jersey().register(MultiPartFeature.class);
     }

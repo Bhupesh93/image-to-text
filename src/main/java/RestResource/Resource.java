@@ -2,6 +2,7 @@ package RestResource;
 
 
 import Helpers.FileHelper;
+import Helpers.RestClient;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
@@ -22,8 +23,9 @@ import java.io.*;
 public class Resource {
 
     String tempDirectory = null;
+    RestClient restClient;
     Logger logger = LoggerFactory.getLogger(Resource.class);
-    public Resource(){
+    public Resource( RestClient restClient){
         tempDirectory = System.getProperty("user.dir")+"\\"+"temp";
         File tempDir = new File(tempDirectory);
         if(!tempDir.exists()){
@@ -31,6 +33,7 @@ public class Resource {
             tempDir.mkdir();
         }
         logger.info("Uploaded files will be stored in this directory "+ tempDirectory);
+        this.restClient = restClient;
     }
 
     @Path("/upload")
@@ -41,7 +44,8 @@ public class Resource {
         logger.debug("upload called with this file " +fileMetaData.getFileName());
         String uploadedPath = tempDirectory + "\\" +fileMetaData.getFileName();
         FileHelper.saveFileToLocation(fileInputStream,uploadedPath);
-        return Response.ok().status(Response.Status.ACCEPTED).build();
+        Response response = restClient.getTextFromImage(uploadedPath);
+        return response;
     }
 
 }
